@@ -311,6 +311,11 @@ func connectionStringResource() *schema.Resource {
 				Optional:    true,
 				Description: "Maximum number of seconds a connection may be reused.",
 			},
+			"username_template": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Template for DisplyaName.",
+			},
 		},
 	}
 }
@@ -511,6 +516,9 @@ func setDatabaseConnectionData(d *schema.ResourceData, prefix string, data map[s
 	}
 	if v, ok := d.GetOkExists(prefix + "max_connection_lifetime"); ok {
 		data["max_connection_lifetime"] = fmt.Sprintf("%ds", v)
+	}
+	if v, ok := d.GetOkExists(prefix + "username_template"); ok {
+		data["username_template"] = v.(string)
 	}
 }
 
@@ -758,7 +766,6 @@ func databaseSecretBackendConnectionUpdate(d *schema.ResourceData, meta interfac
 			}
 		}
 	}
-
 	log.Printf("[DEBUG] Writing connection config to %q", path)
 	_, err = client.Logical().Write(path, data)
 
